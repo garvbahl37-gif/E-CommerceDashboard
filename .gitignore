@@ -1,6 +1,5 @@
-# Data files (too large for GitHub)
+# Raw data (too large for GitHub)
 data/raw/
-data/cleaned/*.csv
 
 # Python
 __pycache__/
