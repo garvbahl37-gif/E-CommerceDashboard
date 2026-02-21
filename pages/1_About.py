@@ -10,16 +10,16 @@ st.set_page_config(
 st.markdown("""
 <style>
     [data-testid="stSidebarNav"] {display: none;}
-    .block-container {padding-top: 2rem;}
+    .block-container {padding-top: 4rem;}
 </style>
 """, unsafe_allow_html=True)
 
 # Top Navbar
-col_nav1, col_nav2, col_nav3 = st.columns([1.5, 1.5, 7])
+col_spacer1, col_nav1, col_nav2, col_spacer2 = st.columns([3, 2, 2, 3])
 with col_nav1:
-    st.page_link("app.py", label="Dashboard", icon="📊", use_container_width=True)
+    st.page_link("app.py", label="Dashboard", use_container_width=True)
 with col_nav2:
-    st.page_link("pages/1_About.py", label="About the Project", icon="ℹ️", use_container_width=True)
+    st.page_link("pages/1_About.py", label="About the Project", use_container_width=True)
 
 st.markdown("---")
 
