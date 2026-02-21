@@ -16,6 +16,7 @@ import os
 # ─── PAGE CONFIG ─────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="E-Commerce Sales Intelligence",
+    page_icon="favicon.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
