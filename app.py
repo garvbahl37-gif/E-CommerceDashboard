@@ -16,10 +16,25 @@ import os
 # ─── PAGE CONFIG ─────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="E-Commerce Sales Intelligence",
-    page_icon="",
+    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Hide default sidebar navigation & reduce top padding
+st.markdown("""
+<style>
+    [data-testid="stSidebarNav"] {display: none;}
+    .block-container {padding-top: 2rem;}
+</style>
+""", unsafe_allow_html=True)
+
+# Top Navbar
+col_nav1, col_nav2, col_nav3 = st.columns([1.5, 1.5, 7])
+with col_nav1:
+    st.page_link("app.py", label="Dashboard", icon="📊", use_container_width=True)
+with col_nav2:
+    st.page_link("pages/1_About.py", label="About the Project", icon="ℹ️", use_container_width=True)
 
 # ─── CUSTOM CSS ─────────────────────────────────────────────────────────────
 st.markdown("""

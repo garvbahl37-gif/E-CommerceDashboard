@@ -6,56 +6,41 @@ st.set_page_config(
     layout="wide"
 )
 
+# Hide sidebar navigation completely & adjust top padding
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    
-    .about-header {
-        text-align: center; padding: 20px 0 10px 0;
-        font-size: 32px; font-weight: 700;
-        color: #1f2937;
-    }
-    .about-subheader {
-        text-align: center; padding: 0 0 30px 0;
-        font-size: 16px; opacity: 0.7;
-    }
-    .section-title {
-        font-size: 22px; font-weight: 600;
-        margin: 30px 0 15px 0; padding-bottom: 8px;
-        border-bottom: 2px solid rgba(128,128,128,0.2);
-        color: #111827;
-    }
-    .highlight-card {
-        background-color: #f8fafc;
-        border-left: 4px solid #3b82f6;
-        padding: 15px 20px;
-        border-radius: 4px;
-        margin: 15px 0;
-        color: #334155;
-    }
+    [data-testid="stSidebarNav"] {display: none;}
+    .block-container {padding-top: 2rem;}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="about-header">About the Project</div>', unsafe_allow_html=True)
-st.markdown('<div class="about-subheader">E-Commerce Sales Intelligence Dashboard</div>', unsafe_allow_html=True)
+# Top Navbar
+col_nav1, col_nav2, col_nav3 = st.columns([1.5, 1.5, 7])
+with col_nav1:
+    st.page_link("app.py", label="Dashboard", icon="📊", use_container_width=True)
+with col_nav2:
+    st.page_link("pages/1_About.py", label="About the Project", icon="ℹ️", use_container_width=True)
 
+st.markdown("---")
+
+# Main About Content
+st.title("About the Project")
+st.markdown("##### E-Commerce Sales Intelligence Dashboard")
+
+st.info("An end-to-end analytics project analyzing 800K+ retail transactions across 41 countries, featuring interactive visualizations, customer segmentation, and strategic business insights.")
+
+st.header("Overview")
 st.markdown("""
-<div class="highlight-card">
-An end-to-end analytics project analyzing 800K+ retail transactions across 41 countries, featuring interactive visualizations, customer segmentation, and strategic business insights.
-</div>
-
-<div class="section-title">Overview</div>
-
 This project transforms raw transactional data from the [UCI Online Retail II](https://archive.ics.uci.edu/ml/datasets/Online+Retail+II) dataset into actionable business intelligence through:
 
 - **Interactive Dashboard** — Real-time Streamlit dashboard with cross-filtering by date, country, and customer segment.
 - **RFM Customer Segmentation** — Recency, Frequency, Monetary scoring to classify 5,800+ customers into 7 behavioral segments.
 - **K-Means Clustering** — Unsupervised learning to discover 4 natural customer groups with CLV estimation.
 - **16 Publication-Quality Visualizations** — Monthly trends, cohort retention, geographic analysis, and more.
+""")
 
-<div class="section-title">Tech Stack</div>
-
+st.header("Tech Stack")
+st.markdown("""
 | Component | Technology |
 |-----------|-----------|
 | **Language** | Python 3.9+ |
@@ -64,34 +49,41 @@ This project transforms raw transactional data from the [UCI Online Retail II](h
 | **Machine Learning** | scikit-learn (K-Means, StandardScaler) |
 | **Dashboard** | Streamlit |
 | **Dataset** | UCI Online Retail II (800K+ rows) |
+""")
 
-<div class="section-title">Methodology</div>
+col_a, col_b = st.columns(2)
+with col_a:
+    st.header("Methodology")
+    with st.expander("1. Data Cleaning & Feature Engineering", expanded=True):
+        st.markdown("""
+        - Handled missing values (Customer ID, Description)
+        - Removed duplicate and cancelled orders
+        - Engineered new temporal features (YearMonth, DayOfWeek, Hour)
+        - Calculated total revenue per transaction
+        """)
+        
+    with st.expander("2. RFM Segmentation", expanded=True):
+        st.markdown("""
+        Each customer was scored on **Recency**, **Frequency**, and **Monetary** using quintile-based scoring (1–5), then mapped to 7 segments:  
+        *Champions, Loyal Customers, Big Spenders, New Customers, Need Attention, At Risk, Hibernating.*
+        """)
+        
+    with st.expander("3. K-Means Clustering", expanded=True):
+        st.markdown("""
+        Applied log-transformation and StandardScaler normalization to RFM features, then used the Elbow Method to determine optimal *k=4* clusters.  
+        Resulting segments: *High-Value, Mid-Value, Occasional, and Dormant customers.*
+        """)
+        
+    with st.expander("4. Customer Lifetime Value (CLV)", expanded=True):
+        st.markdown("`CLV = AOV × Monthly Purchase Frequency × Average Customer Lifespan`")
 
-**1. Data Cleaning & Feature Engineering**
-- Handled missing values (Customer ID, Description)
-- Removed duplicate and cancelled orders
-- Engineered new temporal features (YearMonth, DayOfWeek, Hour)
-- Calculated total revenue per transaction
+with col_b:
+    st.header("Key Findings")
+    st.success("**Revenue**: £17.4M total across 36,900+ orders")
+    st.warning("**Customer Concentration**: 18% of customers (Champions) drive ~40% of revenue")
+    st.error("**Geographic Risk**: 83% of revenue from the UK alone")
+    st.info("**Retention**: 70% customer churn at Month 1 — significant re-engagement opportunity")
+    st.success("**Seasonality**: Q4 (Oct–Dec) generates peak revenue driven by holiday demand")
 
-**2. RFM Segmentation**
-Each customer was scored on **Recency** (days since last purchase), **Frequency** (order count), and **Monetary** (total spend) using quintile-based scoring (1–5), then mapped to 7 segments:  
-*Champions, Loyal Customers, Big Spenders, New Customers, Need Attention, At Risk, Hibernating.*
-
-**3. K-Means Clustering**
-Applied log-transformation and StandardScaler normalization to RFM features, then used the Elbow Method to determine optimal *k=4* clusters.  
-Resulting segments: *High-Value, Mid-Value, Occasional, and Dormant customers.*
-
-**4. Customer Lifetime Value (CLV)**
-Estimated using: `CLV = AOV × Monthly Purchase Frequency × Average Customer Lifespan`
-
-<div class="section-title">Key Findings</div>
-
-- **Revenue**: £17.4M total across 36,900+ orders
-- **Customer Concentration**: 18% of customers (Champions) drive ~40% of revenue
-- **Geographic Risk**: 83% of revenue from the UK alone
-- **Retention**: 70% customer churn at Month 1 — significant re-engagement opportunity
-- **Seasonality**: Q4 (Oct–Dec) generates peak revenue driven by holiday demand
-
----
-*Built by adapting full-scale data science methodologies for e-commerce analytics.*
-""", unsafe_allow_html=True)
+st.markdown("---")
+st.caption("Built by adapting full-scale data science methodologies for e-commerce analytics.")
