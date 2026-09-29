@@ -87,7 +87,7 @@ Live at **https://ecommerce-dashboard-umber-five.vercel.app**
 - Removable chips for every active filter, and **Copy link**: the filters live in the URL, so any view can be shared
 - On phones the filters open as a drawer
 
-**Charts (15)**
+**Charts**
 - KPI tiles with monthly sparklines and change vs the previous period of the same length
 - Monthly performance with a switch between revenue, orders, customers and average order; yearly peaks marked
 - New vs returning revenue (stacked) and order-size distribution
