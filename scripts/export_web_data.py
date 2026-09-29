@@ -62,6 +62,8 @@ def main():
         'recency': rfm['Recency'].astype(int).tolist(),
         'frequency': rfm['Frequency'].astype(int).tolist(),
         'monetary': rfm['Monetary'].round(2).tolist(),
+        'rScore': rfm['R_Score'].astype(int).tolist(),
+        'fScore': rfm['F_Score'].astype(int).tolist(),
     }
 
     # ── Invoices: one row per order ──

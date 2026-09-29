@@ -13,11 +13,15 @@ export function HBars({
   format,
   tipFormat = format,
   rowHeight = 38,
+  onSelect,
+  selected,
 }: {
   rows: BarRow[];
   format: (v: number) => string;
   tipFormat?: (v: number) => string;
   rowHeight?: number;
+  onSelect?: (key: string) => void;
+  selected?: (key: string) => boolean;
 }) {
   const [ref, width] = useWidth<HTMLDivElement>();
   const [active, setActive] = useState<number | null>(null);
@@ -34,29 +38,45 @@ export function HBars({
         x: Math.min(x(a.value), width - 10),
         y: active! * rowHeight + 14,
         title: a.label,
-        rows: [{ value: tipFormat(a.value), label: a.detail ?? "" }],
+        rows: [
+          { value: tipFormat(a.value), label: a.detail ?? "" },
+          ...(onSelect ? [{ value: "", label: selected?.(a.key) ? "Click to clear this filter" : "Click to filter the page" }] : []),
+        ],
       }
     : null;
 
   return (
     <div ref={ref} className="plot" style={{ height }}>
       {width > 0 && (
-        <svg width={width} height={height} role="list">
+        <svg width={width} height={height} role={onSelect ? "group" : "list"}>
           {rows.map((r, i) => {
+            const isSel = selected?.(r.key);
             const y0 = i * rowHeight;
             return (
               <g
                 key={r.key}
-                role="listitem"
+                role={onSelect ? "button" : "listitem"}
                 tabIndex={0}
-                aria-label={`${r.label}: ${tipFormat(r.value)}`}
-                className={`bar-row${active === i ? " is-active" : ""}`}
+                aria-label={`${r.label}: ${tipFormat(r.value)}${onSelect ? ". Press Enter to filter." : ""}`}
+                aria-pressed={onSelect ? !!isSel : undefined}
+                className={`bar-row${active === i ? " is-active" : ""}${onSelect ? " is-clickable" : ""}${isSel ? " is-selected" : ""}`}
                 onPointerEnter={() => setActive(i)}
                 onPointerLeave={() => setActive(null)}
                 onFocus={() => setActive(i)}
                 onBlur={() => setActive(null)}
+                onClick={onSelect ? () => onSelect(r.key) : undefined}
+                onKeyDown={
+                  onSelect
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onSelect(r.key);
+                        }
+                      }
+                    : undefined
+                }
               >
-                <rect x={0} y={y0} width={width} height={rowHeight} fill="transparent" />
+                <rect x={0} y={y0} width={width} height={rowHeight} rx={6} className="row-hit" />
                 <text x={0} y={y0 + 13} className="bar-label">
                   {r.label}
                 </text>
@@ -103,7 +123,8 @@ export function Columns({
   const y = scaleLinear().domain([0, Math.max(1, ...rows.map((r) => r.value))]).nice(4).range([h, 0]);
   const bw = Math.min(24, xb.bandwidth());
   const maxIdx = rows.reduce((b, r, i) => (r.value > rows[b].value ? i : b), 0);
-  const skip = xb.bandwidth() < 26 ? 2 : 1;
+  const longest = Math.max(...rows.map((r) => r.key.length));
+  const skip = Math.max(1, Math.ceil((longest * 7 + 8) / Math.max(1, xb.step())));
 
   const a = active !== null ? rows[active] : null;
   const tip: TipState = a

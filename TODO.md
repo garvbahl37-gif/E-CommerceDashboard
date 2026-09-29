@@ -12,6 +12,11 @@ _Last updated: 29 Sep 2026_
 - [x] About page with corrected findings, method and known limits
 - [x] Deployed to Vercel: https://ecommerce-dashboard-umber-five.vercel.app
 - [x] GitHub repo connected to Vercel (Root Directory = `web`); pushes to `main` auto-deploy
+- [x] Redesign: filter sidebar with facet counts, month range brush, region shortcuts and "Only" buttons; mobile filter drawer
+- [x] Click-to-filter from country bars/table, segments and months; removable active-filter chips
+- [x] Filters saved in the URL, with a Copy link button for sharing views
+- [x] New charts: KPI sparklines with previous-period deltas, metric switcher, new vs returning revenue, order-size distribution, RFM grid, customer concentration curve, top-products table with trends, sortable country table
+- [x] README screenshots refreshed for the new design
 
 ### Bug fixes (Python / Streamlit)
 - [x] `requirements.txt` was missing `streamlit` (Streamlit Cloud deploy would fail)
@@ -29,6 +34,5 @@ _Last updated: 29 Sep 2026_
 ## Next
 - [ ] Re-run cleaning from the raw Excel file to drop orders that were immediately cancelled (~£245K, e.g. PAPER CRAFT, LITTLE BIRDIE on 9 Dec 2011)
 - [ ] RFM frequency scoring: `rank(method='first')` splits ties arbitrarily (447 one-order customers get F=2); switch to tie-aware bins and regenerate `rfm_data.csv`
-- [ ] Keep filter state in the URL so filtered views can be shared
 - [ ] Deploy the Streamlit app to Streamlit Cloud and link it from the web About page
 - [ ] Regenerate `outputs/figures/` after the cluster-label and CLV fixes

@@ -3,29 +3,42 @@
 import { scaleLinear } from "d3-scale";
 import { area, curveMonotoneX, line } from "d3-shape";
 import { KeyboardEvent, PointerEvent, useState } from "react";
-import { TipState, Tooltip, useWidth } from "./primitives";
-import { gbp, gbpCompact, int } from "@/lib/format";
+import { TipRow, TipState, Tooltip, useWidth } from "./primitives";
 
-export type TrendPoint = { label: string; short: string; value: number; orders: number; partial?: boolean };
+export type TrendPoint = { label: string; short: string; value: number; partial?: boolean; rows: TipRow[] };
 
-/** Monthly revenue: 2px line over a 10% wash, crosshair snaps to the nearest month. */
-export function TrendChart({ data, height = 300, highlight }: { data: TrendPoint[]; height?: number; highlight: number[] }) {
+/** Monthly measure: 2px line over a 10% wash, crosshair snaps to the nearest month. */
+export function TrendChart({
+  data,
+  height = 300,
+  highlight,
+  axisFormat,
+  labelFormat = axisFormat,
+  onSelect,
+}: {
+  data: TrendPoint[];
+  height?: number;
+  highlight: number[];
+  axisFormat: (v: number) => string;
+  labelFormat?: (v: number) => string;
+  onSelect?: (index: number) => void;
+}) {
   const [ref, width] = useWidth<HTMLDivElement>();
   const [active, setActive] = useState<number | null>(null);
 
-  const m = { top: 28, right: 20, bottom: 30, left: 56 };
+  const m = { top: 28, right: 20, bottom: 30, left: 58 };
   const w = Math.max(0, width - m.left - m.right);
   const h = height - m.top - m.bottom;
-  const max = Math.max(1, ...data.map((d) => d.value));
+  const max = Math.max(1e-9, ...data.map((d) => d.value));
   const x = scaleLinear().domain([0, Math.max(1, data.length - 1)]).range([0, w]);
   const y = scaleLinear().domain([0, max]).nice(4).range([h, 0]);
   const ticks = y.ticks(4);
 
-  const complete = data.filter((d) => !d.partial);
+  const partialIdx = data.findIndex((d) => d.partial);
+  const complete = partialIdx >= 0 ? data.slice(0, partialIdx) : data;
   const linePath = line<TrendPoint>().x((_, i) => x(i)).y((d) => y(d.value)).curve(curveMonotoneX)(complete) ?? "";
   const areaPath =
     area<TrendPoint>().x((_, i) => x(i)).y0(h).y1((d) => y(d.value)).curve(curveMonotoneX)(complete) ?? "";
-  const partialIdx = data.findIndex((d) => d.partial);
 
   const every = w < 420 ? 4 : w < 760 ? 2 : 1;
 
@@ -38,6 +51,7 @@ export function TrendChart({ data, height = 300, highlight }: { data: TrendPoint
     if (e.key === "ArrowRight") setActive((a) => Math.min(data.length - 1, (a ?? -1) + 1));
     else if (e.key === "ArrowLeft") setActive((a) => Math.max(0, (a ?? data.length) - 1));
     else if (e.key === "Escape") setActive(null);
+    else if ((e.key === "Enter" || e.key === " ") && active !== null && onSelect) onSelect(active);
     else return;
     e.preventDefault();
   }
@@ -48,10 +62,7 @@ export function TrendChart({ data, height = 300, highlight }: { data: TrendPoint
         x: m.left + x(active!),
         y: m.top + y(a.value),
         title: a.label + (a.partial ? " (to date)" : ""),
-        rows: [
-          { value: gbp(a.value), label: "revenue" },
-          { value: int(a.orders), label: "orders" },
-        ],
+        rows: onSelect && data.length > 1 ? [...a.rows, { value: "", label: "Click to focus on this month" }] : a.rows,
       }
     : null;
 
@@ -62,19 +73,21 @@ export function TrendChart({ data, height = 300, highlight }: { data: TrendPoint
           width={width}
           height={height}
           role="img"
-          aria-label="Monthly revenue line chart. Use left and right arrow keys to read values."
+          aria-label="Monthly trend line chart. Use left and right arrow keys to read values, Enter to focus on a month."
           tabIndex={0}
           onKeyDown={onKey}
           onBlur={() => setActive(null)}
           onPointerMove={(e: PointerEvent<SVGSVGElement>) => pick(e.clientX, e.currentTarget.getBoundingClientRect())}
           onPointerLeave={() => setActive(null)}
+          onClick={() => active !== null && onSelect && data.length > 1 && onSelect(active)}
+          style={{ cursor: onSelect && data.length > 1 ? "pointer" : undefined }}
         >
           <g transform={`translate(${m.left},${m.top})`}>
             {ticks.map((t) => (
               <g key={t} transform={`translate(0,${y(t)})`}>
                 <line x2={w} className={t === 0 ? "axis-line" : "grid-line"} />
                 <text x={-10} dy="0.32em" textAnchor="end" className="tick">
-                  {gbpCompact(t)}
+                  {axisFormat(t)}
                 </text>
               </g>
             ))}
@@ -96,14 +109,13 @@ export function TrendChart({ data, height = 300, highlight }: { data: TrendPoint
                 className="trend-partial"
               />
             )}
-            {partialIdx >= 0 && (
-              <circle cx={x(partialIdx)} cy={y(data[partialIdx].value)} r={4.5} className="dot-hollow" />
-            )}
+            {partialIdx >= 0 && <circle cx={x(partialIdx)} cy={y(data[partialIdx].value)} r={4.5} className="dot-hollow" />}
+            {data.length === 1 && <circle cx={x(0)} cy={y(data[0].value)} r={5} className="dot-active" />}
             {highlight.map((i) => (
               <g key={i} transform={`translate(${x(i)},${y(data[i].value)})`}>
                 <circle r={5} className="dot-peak" />
-                <text y={-12} textAnchor={x(i) > w - 60 ? "end" : "middle"} className="peak-label">
-                  {gbpCompact(data[i].value)}
+                <text y={-12} textAnchor={x(i) > w - 60 ? "end" : x(i) < 40 ? "start" : "middle"} className="peak-label">
+                  {labelFormat(data[i].value)}
                 </text>
               </g>
             ))}

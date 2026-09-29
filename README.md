@@ -79,42 +79,23 @@ This project transforms raw transactional data from the [UCI Online Retail II](h
 
 Live at **https://ecommerce-dashboard-umber-five.vercel.app**
 
-- Headline sentence and 6 KPIs that rewrite themselves for the active filters
-- Monthly revenue trend with yearly peaks marked (partial December 2011 shown hollow)
-- RFM segments: share of customers vs share of revenue
-- Cohort retention heatmap and K-Means cluster small multiples
-- Top products (merchandise only) and top countries (with a "leave out the UK" toggle)
+**Filtering**
+- A filter sidebar with every option visible: period presets, a drag-to-select month range over a mini revenue chart, customer segments and countries
+- Each option shows what it holds under the other filters (customers per segment, revenue per country), plus an **Only** button to isolate it
+- One-click country groups: UK, Europe, Rest of world, Outside UK, and a country search
+- **Click to filter** from the charts: a country bar or table row, a customer segment, or a month on the trend chart. Click again to clear
+- Removable chips for every active filter, and **Copy link**: the filters live in the URL, so any view can be shared
+- On phones the filters open as a drawer
+
+**Charts (15)**
+- KPI tiles with monthly sparklines and change vs the previous period of the same length
+- Monthly performance with a switch between revenue, orders, customers and average order; yearly peaks marked
+- New vs returning revenue (stacked) and order-size distribution
+- RFM segments (share of customers vs share of revenue), RFM recency × frequency grid, customer concentration curve, cohort retention heatmap, K-Means cluster small multiples
+- Top 10/25 products table with monthly trend sparklines and revenue share
+- Top 10 countries plus a sortable table of every country (revenue, share, orders, customers, average order)
 - Weekday × hour revenue heatmap and quarterly revenue
-- Every chart has hover/keyboard tooltips and a "Show table" view; light and dark mode; responsive to phone width
-
-### Screenshots
-
-**Filters** — period presets or a custom month range, country and customer-segment pickers. Every number on the page follows them.
-
-![Filter bar](docs/screenshots/filters.png)
-
-**Who buys** — RFM segments (share of customers vs share of revenue), cohort retention, and the four K-Means clusters.
-
-![Customer segments, retention and clusters](docs/screenshots/customers.png)
-
-**What sells, and where** — top products (merchandise only) and top countries, with the UK highlighted.
-
-![Top products and countries](docs/screenshots/products-markets.png)
-
-**When orders come in** — revenue by weekday and hour, and by quarter.
-
-![Weekday by hour heatmap and quarterly revenue](docs/screenshots/timing.png)
-
-<table>
-  <tr>
-    <td width="72%"><strong>Dark mode</strong><br><img src="docs/screenshots/dark-mode.png" alt="Dashboard in dark mode"></td>
-    <td width="28%"><strong>Mobile</strong><br><img src="docs/screenshots/mobile.png" alt="Dashboard on a phone"></td>
-  </tr>
-</table>
-
-**About page** — findings, method and known limits.
-
-![About page](docs/screenshots/about.png)
+- Every chart has hover and keyboard tooltips and a table view; light and dark mode; responsive down to phone width
 
 ```bash
 # Rebuild the data export after changing the pipeline
@@ -127,6 +108,44 @@ npm run build
 ```
 
 Deploy: pushes to `main` auto-deploy via the connected Vercel project `ecommerce-dashboard` (Root Directory `web`); manual deploy with `cd web && vercel deploy --prod`.
+
+### Screenshots
+
+**Filtered view.** Here, Germany's Champions in 2011, with each KPI compared to 2010.
+
+![Filtered view](docs/screenshots/filtered-view.png)
+
+**Monthly mix.** Revenue from new vs returning customers, and the order-size distribution.
+
+![New vs returning revenue and order size](docs/screenshots/overview-charts.png)
+
+**Customers.** RFM segments, the RFM grid, customer concentration, cohort retention and the four K-Means clusters.
+
+![Customers section](docs/screenshots/customers.png)
+
+**Products.** Top products with monthly trends and share of revenue.
+
+![Products table](docs/screenshots/products.png)
+
+**Markets.** Click a country in the chart or the table to filter the page.
+
+![Markets section](docs/screenshots/markets.png)
+
+**Timing.** Revenue by weekday and hour, and by quarter.
+
+![Timing section](docs/screenshots/timing.png)
+
+<table>
+  <tr>
+    <td width="64%"><strong>Dark mode</strong><br><img src="docs/screenshots/dark-mode.png" alt="Dashboard in dark mode"></td>
+    <td width="18%"><strong>Mobile</strong><br><img src="docs/screenshots/mobile.png" alt="Dashboard on a phone"></td>
+    <td width="18%"><strong>Mobile filters</strong><br><img src="docs/screenshots/mobile-filters.png" alt="Filter drawer on a phone"></td>
+  </tr>
+</table>
+
+**About page.** Findings, method and known limits.
+
+![About page](docs/screenshots/about.png)
 
 ## Streamlit Dashboard
 

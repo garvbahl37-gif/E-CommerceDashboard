@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { seqColor, TipState, Tooltip, useWidth } from "./primitives";
+import { seqColor, seqStep, TipRow, TipState, Tooltip, useWidth } from "./primitives";
 
 /** Grid of cells on a quantised one-hue sequential ramp. NaN cells are left empty. */
 export function Heatmap({
@@ -14,6 +14,9 @@ export function Heatmap({
   rowLabelWidth = 64,
   colEvery = 1,
   cellHeight = 22,
+  cellLabel,
+  extraRows,
+  colTitle,
 }: {
   rows: string[];
   cols: string[];
@@ -24,10 +27,13 @@ export function Heatmap({
   rowLabelWidth?: number;
   colEvery?: number;
   cellHeight?: number;
+  cellLabel?: (v: number, r: number, c: number) => string;
+  extraRows?: (r: number, c: number) => TipRow[];
+  colTitle?: string;
 }) {
   const [ref, width] = useWidth<HTMLDivElement>();
   const [active, setActive] = useState<[number, number] | null>(null);
-  const top = 20;
+  const top = colTitle ? 36 : 20;
   const gap = 2;
   const cw = Math.max(4, (width - rowLabelWidth) / Math.max(1, cols.length));
   const height = top + rows.length * cellHeight;
@@ -38,7 +44,7 @@ export function Heatmap({
         x: rowLabelWidth + active[1] * cw + cw / 2,
         y: top + active[0] * cellHeight,
         title: cellTitle(active[0], active[1]),
-        rows: [{ value: format(values[active[0]][active[1]]), label: "" }],
+        rows: [{ value: format(values[active[0]][active[1]]), label: "" }, ...(extraRows?.(active[0], active[1]) ?? [])],
       }
     : null;
 
@@ -46,9 +52,14 @@ export function Heatmap({
     <div ref={ref} className="plot" style={{ height }} onPointerLeave={() => setActive(null)}>
       {width > 0 && (
         <svg width={width} height={height} aria-hidden="true">
+          {colTitle && (
+            <text x={rowLabelWidth} y={11} className="tick">
+              {colTitle}
+            </text>
+          )}
           {cols.map((c, j) =>
             j % colEvery === 0 ? (
-              <text key={j} x={rowLabelWidth + j * cw + cw / 2} y={12} textAnchor="middle" className="tick">
+              <text key={j} x={rowLabelWidth + j * cw + cw / 2} y={top - 8} textAnchor="middle" className="tick">
                 {c}
               </text>
             ) : null,
@@ -62,17 +73,29 @@ export function Heatmap({
               )}
               {values[i].map((v, j) =>
                 Number.isFinite(v) ? (
-                  <rect
-                    key={j}
-                    x={rowLabelWidth + j * cw + gap / 2}
-                    y={gap / 2}
-                    width={Math.max(1, cw - gap)}
-                    height={cellHeight - gap}
-                    rx={2}
-                    fill={seqColor(max > 0 ? v / max : 0)}
-                    className={active && active[0] === i && active[1] === j ? "cell is-active" : "cell"}
-                    onPointerEnter={() => setActive([i, j])}
-                  />
+                  <g key={j} onPointerEnter={() => setActive([i, j])}>
+                    <rect
+                      x={rowLabelWidth + j * cw + gap / 2}
+                      y={gap / 2}
+                      width={Math.max(1, cw - gap)}
+                      height={cellHeight - gap}
+                      rx={cellHeight > 30 ? 4 : 2}
+                      fill={seqColor(max > 0 ? v / max : 0)}
+                      className={active && active[0] === i && active[1] === j ? "cell is-active" : "cell"}
+                    />
+                    {cellLabel && cw > 34 && (
+                      <text
+                        x={rowLabelWidth + j * cw + cw / 2}
+                        y={cellHeight / 2}
+                        dy="0.34em"
+                        textAnchor="middle"
+                        className="cell-label"
+                        style={{ fill: `var(--seq-ink-${seqStep(max > 0 ? v / max : 0)})` }}
+                      >
+                        {cellLabel(v, i, j)}
+                      </text>
+                    )}
+                  </g>
                 ) : null,
               )}
             </g>
