@@ -83,7 +83,9 @@ function Loaded({ ds }: { ds: Dataset }) {
     const cur = peakByYear.get(yr);
     if (cur === undefined || d.value > trend[cur].value) peakByYear.set(yr, i);
   });
-  const peaks = trend.length > 3 ? [...peakByYear.values()] : [];
+  // Only mark a peak for years with at least six months in view; a lone month isn't a peak.
+  const monthsInYear = (yr: string) => trend.filter((d) => d.label.endsWith(yr)).length;
+  const peaks = [...peakByYear].filter(([yr]) => monthsInYear(yr) >= 6).map(([, i]) => i);
 
   const empty = s.orders === 0;
   const topCountry = s.countries[0];
