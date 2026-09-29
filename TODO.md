@@ -11,6 +11,7 @@ _Last updated: 29 Sep 2026_
 - [x] Hover + keyboard tooltips and a table view on every chart; light/dark mode; responsive to phone width
 - [x] About page with corrected findings, method and known limits
 - [x] Deployed to Vercel: https://ecommerce-dashboard-umber-five.vercel.app
+- [x] GitHub repo connected to Vercel (Root Directory = `web`); pushes to `main` auto-deploy
 
 ### Bug fixes (Python / Streamlit)
 - [x] `requirements.txt` was missing `streamlit` (Streamlit Cloud deploy would fail)
@@ -26,7 +27,6 @@ _Last updated: 29 Sep 2026_
 - [x] Wrong figures in README, About page and reports (Champions 18%/40% → 22%/68%, churn 70% → ~79%, orders 22K → 36,969, AOV £790 → £470, customers 4,300 → 5,878)
 
 ## Next
-- [ ] Connect the GitHub repo to the Vercel project (Root Directory = `web`) so pushes to `main` auto-deploy
 - [ ] Re-run cleaning from the raw Excel file to drop orders that were immediately cancelled (~£245K, e.g. PAPER CRAFT, LITTLE BIRDIE on 9 Dec 2011)
 - [ ] RFM frequency scoring: `rank(method='first')` splits ties arbitrarily (447 one-order customers get F=2); switch to tie-aware bins and regenerate `rfm_data.csv`
 - [ ] Keep filter state in the URL so filtered views can be shared

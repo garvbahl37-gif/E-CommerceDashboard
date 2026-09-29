@@ -91,7 +91,7 @@ npm run dev        # http://localhost:3000
 npm run build
 ```
 
-Deploy: `cd web && vercel deploy --prod` (Vercel project `ecommerce-dashboard`).
+Deploy: pushes to `main` auto-deploy via the connected Vercel project `ecommerce-dashboard` (Root Directory `web`); manual deploy with `cd web && vercel deploy --prod`.
 
 ## Streamlit Dashboard
 
