@@ -8,6 +8,10 @@ An end-to-end analytics project analysing 779K+ cleaned retail transaction lines
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.x-red)
 ![Pandas](https://img.shields.io/badge/Pandas-2.x-green)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.x-orange)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![Vercel](https://img.shields.io/badge/Deployed-Vercel-black)
+
+[![Dashboard overview](docs/screenshots/dashboard-overview.png)](https://ecommerce-dashboard-umber-five.vercel.app)
 
 ## Overview
 
@@ -56,7 +60,9 @@ This project transforms raw transactional data from the [UCI Online Retail II](h
 ├── data/
 │   ├── raw/                        # Original Excel file (not tracked)
 │   └── cleaned/                    # Processed CSVs (tracked, used by both dashboards)
+├── docs/screenshots/               # README screenshots of the web dashboard
 ├── requirements.txt
+├── TODO.md
 └── README.md
 ```
 
@@ -80,6 +86,35 @@ Live at **https://ecommerce-dashboard-umber-five.vercel.app**
 - Top products (merchandise only) and top countries (with a "leave out the UK" toggle)
 - Weekday × hour revenue heatmap and quarterly revenue
 - Every chart has hover/keyboard tooltips and a "Show table" view; light and dark mode; responsive to phone width
+
+### Screenshots
+
+**Filters** — period presets or a custom month range, country and customer-segment pickers. Every number on the page follows them.
+
+![Filter bar](docs/screenshots/filters.png)
+
+**Who buys** — RFM segments (share of customers vs share of revenue), cohort retention, and the four K-Means clusters.
+
+![Customer segments, retention and clusters](docs/screenshots/customers.png)
+
+**What sells, and where** — top products (merchandise only) and top countries, with the UK highlighted.
+
+![Top products and countries](docs/screenshots/products-markets.png)
+
+**When orders come in** — revenue by weekday and hour, and by quarter.
+
+![Weekday by hour heatmap and quarterly revenue](docs/screenshots/timing.png)
+
+<table>
+  <tr>
+    <td width="72%"><strong>Dark mode</strong><br><img src="docs/screenshots/dark-mode.png" alt="Dashboard in dark mode"></td>
+    <td width="28%"><strong>Mobile</strong><br><img src="docs/screenshots/mobile.png" alt="Dashboard on a phone"></td>
+  </tr>
+</table>
+
+**About page** — findings, method and known limits.
+
+![About page](docs/screenshots/about.png)
 
 ```bash
 # Rebuild the data export after changing the pipeline
