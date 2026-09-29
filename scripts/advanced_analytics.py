@@ -25,6 +25,7 @@ BASE_DIR = os.path.dirname(__file__)
 CLEANED_PATH = os.path.join(BASE_DIR, '..', 'data', 'cleaned', 'retail_cleaned.csv')
 RFM_PATH = os.path.join(BASE_DIR, '..', 'data', 'cleaned', 'rfm_data.csv')
 FIG_DIR = os.path.join(BASE_DIR, '..', 'outputs', 'figures')
+os.makedirs(FIG_DIR, exist_ok=True)
 
 PALETTE = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#3B1F2B',
            '#44BBA4', '#E94F37', '#393E41', '#D4A373', '#6A994E']
@@ -95,10 +96,13 @@ def kmeans_clustering(rfm: pd.DataFrame) -> pd.DataFrame:
     }).round(1)
     cluster_profile.columns = ['Avg_Recency', 'Avg_Frequency', 'Avg_Monetary', 'Total_Revenue', 'Count']
     
-    # Label clusters by business meaning
+    # Label clusters by business meaning: the two highest spenders are High/Mid-Value;
+    # of the remaining two, the one that hasn't bought for longest is Dormant.
     cluster_profile = cluster_profile.sort_values('Avg_Monetary', ascending=False)
-    labels = ['💎 High-Value', '⭐ Mid-Value', '🔄 Occasional', '❄️ Dormant']
-    label_map = {cluster_profile.index[i]: labels[i] for i in range(len(labels))}
+    high, mid, *low = cluster_profile.index
+    low = sorted(low, key=lambda c: cluster_profile.loc[c, 'Avg_Recency'])
+    label_map = {high: '💎 High-Value', mid: '⭐ Mid-Value',
+                 low[0]: '🔄 Occasional', low[1]: '❄️ Dormant'}
     rfm['ClusterLabel'] = rfm['Cluster'].map(label_map)
     
     print("\n  Cluster Profiles:")
@@ -186,7 +190,9 @@ def clv_estimation(df: pd.DataFrame, rfm: pd.DataFrame):
     
     # CLV = AOV × Monthly Purchase Frequency × Avg Active Lifespan (months)
     avg_aov = active['aov'].mean()
-    avg_freq = active['monthly_frequency'].mean()
+    # Pooled rate (total orders / total active months). A plain mean of per-customer ratios is
+    # dominated by customers with a lifespan of a few days (e.g. 2 orders in 1 day = 60/month).
+    avg_freq = active['order_count'].sum() / active['lifespan_months'].sum()
     avg_lifespan = active['lifespan_months'].mean()
     
     clv = avg_aov * avg_freq * avg_lifespan

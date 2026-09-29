@@ -88,9 +88,9 @@ st.markdown("""
 # Top Navbar
 col_spacer1, col_nav1, col_nav2, col_spacer2 = st.columns([3, 2, 2, 3])
 with col_nav1:
-    st.page_link("app.py", label="Dashboard", use_container_width=True)
+    st.page_link("app.py", label="Dashboard", width="stretch")
 with col_nav2:
-    st.page_link("pages/1_About.py", label="About the Project", use_container_width=True)
+    st.page_link("pages/1_About.py", label="About the Project", width="stretch")
 
 st.markdown("---")
 
@@ -98,7 +98,7 @@ st.markdown("---")
 col_hero, col_empty = st.columns([8, 2])
 with col_hero:
     st.markdown('<h1 class="main-title">E-Commerce Intelligence</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="subtitle">Turning 800K+ raw transactions into strategic business insights</p>', unsafe_allow_html=True)
+    st.markdown('<p class="subtitle">Turning 779K+ cleaned transaction lines into strategic business insights</p>', unsafe_allow_html=True)
     st.info("This end-to-end analytics project analyzes retail transactions across 41 countries, featuring interactive visualizations, RFM customer segmentation, and unsupervised learning algorithms.")
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -111,7 +111,7 @@ with col1:
     <div class="feature-card">
         <div class="feature-number">01</div>
         <div class="feature-title">Interactive Analytics</div>
-        <div class="feature-desc">Real-time Streamlit dashboard with cross-filtering by date, country, and segment. Includes 16 publication-quality dynamic charts.</div>
+        <div class="feature-desc">Real-time Streamlit dashboard with cross-filtering by date, country, and segment. Includes 8 interactive charts, plus 16 publication-quality static figures from the analysis scripts.</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -158,9 +158,9 @@ with col_right:
     st.markdown("""
     <div style="background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
         <div style="margin-bottom: 12px;"><strong style="color: #f8fafc; font-size: 1.05rem;">17.4M Revenue</strong><br><span style="color:#94a3b8; font-size:0.9em;">GBP total generated across 36,900+ verified orders.</span></div>
-        <div style="margin-bottom: 12px;"><strong style="color: #f8fafc; font-size: 1.05rem;">Pareto Principle Active</strong><br><span style="color:#94a3b8; font-size:0.9em;">Just 18% of customers (Champions) drive approx. 40% of total revenue.</span></div>
+        <div style="margin-bottom: 12px;"><strong style="color: #f8fafc; font-size: 1.05rem;">Pareto Principle Active</strong><br><span style="color:#94a3b8; font-size:0.9em;">Just 22% of customers (Champions) drive approx. 68% of total revenue.</span></div>
         <div style="margin-bottom: 12px;"><strong style="color: #f8fafc; font-size: 1.05rem;">Geographic Risk</strong><br><span style="color:#94a3b8; font-size:0.9em;">83% of all revenue is concentrated in the UK alone.</span></div>
-        <div style="margin-bottom: 12px;"><strong style="color: #f8fafc; font-size: 1.05rem;">High Initial Churn</strong><br><span style="color:#94a3b8; font-size:0.9em;">70% customer churn at Month 1 presents a significant re-engagement opportunity.</span></div>
+        <div style="margin-bottom: 12px;"><strong style="color: #f8fafc; font-size: 1.05rem;">High Initial Churn</strong><br><span style="color:#94a3b8; font-size:0.9em;">~79% of customers do not return in Month 1 (avg. Month-1 retention 21%), presenting a significant re-engagement opportunity.</span></div>
         <div><strong style="color: #f8fafc; font-size: 1.05rem;">Q4 Seasonality</strong><br><span style="color:#94a3b8; font-size:0.9em;">October to December generates peak revenue driven by holiday demand.</span></div>
     </div>
     """, unsafe_allow_html=True)

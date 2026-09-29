@@ -32,9 +32,9 @@ st.markdown("""
 # Top Navbar
 col_spacer1, col_nav1, col_nav2, col_spacer2 = st.columns([3, 2, 2, 3])
 with col_nav1:
-    st.page_link("app.py", label="Dashboard", use_container_width=True)
+    st.page_link("app.py", label="Dashboard", width="stretch")
 with col_nav2:
-    st.page_link("pages/1_About.py", label="About the Project", use_container_width=True)
+    st.page_link("pages/1_About.py", label="About the Project", width="stretch")
 
 # ─── CUSTOM CSS ─────────────────────────────────────────────────────────────
 st.markdown("""
@@ -132,13 +132,27 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("*Built with Python, Pandas & Streamlit*")
 
 # ─── APPLY FILTERS ──────────────────────────────────────────────────────────
+# While a range is being picked the widget returns a single date; treat it as a one-day range
 if len(date_range) == 2:
-    df = df_full[(df_full['InvoiceDate'].dt.date >= date_range[0]) &
-                  (df_full['InvoiceDate'].dt.date <= date_range[1])]
+    start_date, end_date = date_range
+elif len(date_range) == 1:
+    start_date = end_date = date_range[0]
+    st.sidebar.caption("Select an end date to complete the range (showing a single day).")
 else:
-    df = df_full.copy()
+    start_date, end_date = min_date, max_date
 
+df = df_full[(df_full['InvoiceDate'] >= pd.Timestamp(start_date)) &
+             (df_full['InvoiceDate'] < pd.Timestamp(end_date) + pd.Timedelta(days=1))]
 df = df[df['Country'].isin(selected_countries)]
+
+# Segment filter: RFM segments are per-customer labels (scored on full history),
+# so apply them to the transactions by customer ID — this drives every KPI and chart.
+missing_segments = set()
+if all_segments:
+    in_scope = rfm_full[rfm_full['CustomerID'].isin(df['Customer ID'].unique())]
+    missing_segments = set(selected_segments) - set(in_scope['Segment'].unique())
+    segment_customers = rfm_full.loc[rfm_full['Segment'].isin(selected_segments), 'CustomerID']
+    df = df[df['Customer ID'].isin(segment_customers)]
 
 
 # ─── HEADER ────────────────────────────────────────────────────────────────
@@ -158,13 +172,30 @@ if len(df) > 0:
     aov = total_revenue / total_orders if total_orders > 0 else 0
     
     monthly_rev = df.groupby('YearMonth')['Revenue'].sum().sort_index()
-    latest_growth = (monthly_rev.iloc[-1] - monthly_rev.iloc[-2]) / monthly_rev.iloc[-2] * 100 if len(monthly_rev) >= 2 else 0
-    
+    # Exclude a partial final month (data ends 9 Dec 2011, or the range ends mid-month)
+    partial_note = ''
+    last_period = pd.Period(monthly_rev.index[-1], 'M')
+    if end_date < last_period.end_time.date():
+        partial_note = f"{last_period.strftime('%b %Y')} partial, excluded"
+        monthly_rev = monthly_rev.iloc[:-1]
+    if len(monthly_rev) >= 2:
+        latest_growth = (monthly_rev.iloc[-1] - monthly_rev.iloc[-2]) / monthly_rev.iloc[-2] * 100
+        growth_label = '{} vs {}'.format(pd.Period(monthly_rev.index[-1], 'M').strftime('%b %Y'),
+                                         pd.Period(monthly_rev.index[-2], 'M').strftime('%b %Y'))
+        growth_value = f'{latest_growth:+.1f}%'
+    else:
+        latest_growth = 0
+        growth_label = 'needs 2 full months'
+        growth_value = 'N/A'
+
     purchase_counts = df.groupby('Customer ID')['Invoice'].nunique()
     repeat_rate = (purchase_counts > 1).sum() / len(purchase_counts) * 100
 
     delta_class = 'positive' if latest_growth >= 0 else 'negative'
     delta_arrow = '↑' if latest_growth >= 0 else '↓'
+    if growth_value == 'N/A':
+        delta_arrow = ''
+    partial_html = f'<div class="metric-delta">{partial_note}</div>' if partial_note else ''
 
     st.markdown(f"""
     <div class="metric-row">
@@ -186,8 +217,8 @@ if len(df) > 0:
         </div>
         <div class="metric-card">
             <div class="metric-label">Latest MoM Growth</div>
-            <div class="metric-value">{latest_growth:+.1f}%</div>
-            <div class="metric-delta {delta_class}">{delta_arrow} vs prev month</div>
+            <div class="metric-value">{growth_value}</div>
+            <div class="metric-delta {delta_class}">{delta_arrow} {growth_label}</div>{partial_html}
         </div>
         <div class="metric-card">
             <div class="metric-label">Repeat Rate</div>
@@ -233,6 +264,7 @@ if len(df) > 0:
         fig.patch.set_facecolor('white'); ax.set_facecolor('#FAFAFA')
         if len(quarterly) > 0:
             ax.bar(quarterly['Quarter'], quarterly['Revenue'], color='#A23B72', width=0.5, edgecolor='none')
+            ax.set_xticks(range(len(quarterly)))
             ax.set_xticklabels(quarterly['Quarter'], rotation=45, ha='right', fontsize=8, color='#555')
         ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'£{x:,.0f}'))
         style_ax(ax, 'Quarterly Revenue')
@@ -241,18 +273,13 @@ if len(df) > 0:
     # ─── ROW 2: Customer Intelligence ───────────────────────────────────────
     st.markdown('<div class="section-header">Customer Intelligence</div>', unsafe_allow_html=True)
 
-    # Compute rfm_filtered ONCE for both charts in this row
+    # Compute rfm_filtered ONCE for both charts in this row (df is already segment-filtered)
     filtered_customers = df['Customer ID'].unique()
     rfm_filtered = rfm_full[rfm_full['CustomerID'].isin(filtered_customers)]
-    if selected_segments:
-        rfm_filtered = rfm_filtered[rfm_filtered['Segment'].isin(selected_segments)]
-    
+
     # Show info if some selected segments have no customers
-    if selected_segments:
-        available = set(rfm_full[rfm_full['CustomerID'].isin(filtered_customers)]['Segment'].unique())
-        missing = set(selected_segments) - available
-        if missing:
-            st.info(f"No customers found for: {', '.join(sorted(missing))} in the selected countries.")
+    if missing_segments:
+        st.info(f"No customers found for: {', '.join(sorted(missing_segments))} in the selected date range and countries.")
 
     col_left, col_right = st.columns(2)
 
@@ -277,7 +304,9 @@ if len(df) > 0:
         plt.tight_layout(); st.pyplot(fig); plt.close()
 
     with col_right:
-        seg_revenue = rfm_filtered.groupby('Segment')['Monetary'].sum().sort_values(ascending=True)
+        # Revenue within the current filters (not all-time RFM Monetary), grouped by customer segment
+        seg_map = rfm_filtered.set_index('CustomerID')['Segment']
+        seg_revenue = df.groupby(df['Customer ID'].map(seg_map))['Revenue'].sum().sort_values(ascending=True)
         fig, ax = plt.subplots(figsize=(10, CHART_H_BARH))
         fig.patch.set_facecolor('white'); ax.set_facecolor('#FAFAFA')
         if len(seg_revenue) > 0:
@@ -340,6 +369,7 @@ if len(df) > 0:
         fig, ax = plt.subplots(figsize=(10, CHART_H))
         fig.patch.set_facecolor('white'); ax.set_facecolor('#FAFAFA')
         ax.bar(daily['Day'], daily['Revenue'], color='#E94F37', width=0.5, edgecolor='none')
+        ax.set_xticks(range(len(daily)))
         ax.set_xticklabels(daily['Day'], rotation=30, ha='right', fontsize=9, color='#555')
         ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'£{x:,.0f}'))
         style_ax(ax, 'Revenue by Day of Week')
@@ -355,4 +385,4 @@ if len(df) > 0:
     """, unsafe_allow_html=True)
 
 else:
-    st.warning("No data matches the selected filters. Please adjust the date range or country selection.")
+    st.warning("No data matches the selected filters. Please adjust the date range, country or segment selection.")

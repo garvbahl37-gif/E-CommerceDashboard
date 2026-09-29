@@ -2,7 +2,7 @@
 
 ## Recommendation 1: Launch a Month-1 Customer Re-Engagement Program
 
-**Finding:** Cohort retention analysis shows ~70% of first-time buyers never return after their first purchase.
+**Finding:** Cohort retention analysis shows ~79% of first-time buyers do not order again the following month.
 
 **Recommendation:**
 - Implement a 3-touch automated email sequence triggered after first purchase (Day 3, Day 7, Day 14)
@@ -17,7 +17,7 @@
 
 ## Recommendation 2: Implement VIP Loyalty Program for Champions
 
-**Finding:** RFM Champions (~18% of customers) contribute ~40% of total revenue. K-Means clustering confirms this high-value segment has distinct purchasing behaviour (high frequency, high monetary, low recency).
+**Finding:** RFM Champions (~22% of customers) contribute ~68% of total revenue. K-Means clustering confirms this high-value segment has distinct purchasing behaviour (high frequency, high monetary, low recency).
 
 **Recommendation:**
 - Create a tiered loyalty program (Silver → Gold → Platinum) based on spend thresholds
@@ -62,7 +62,7 @@
 
 ## Recommendation 5: Increase AOV Through Cross-Sell Bundles
 
-**Finding:** Current AOV of ~£790 presents headroom for growth through strategic bundling and upselling.
+**Finding:** Current AOV of ~£470 presents headroom for growth through strategic bundling and upselling.
 
 **Recommendation:**
 - Create "frequently bought together" bundles on product pages
@@ -71,7 +71,7 @@
 
 **Expected Impact:** 10% AOV increase → £1.2M+ additional annual revenue
 
-**KPI to Track:** Average Order Value (target: £900+)
+**KPI to Track:** Average Order Value (target: £550+)
 
 ---
 

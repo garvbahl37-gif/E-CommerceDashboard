@@ -520,7 +520,7 @@ def analysis_day_of_week(df: pd.DataFrame):
     print("\n─── Analysis 11: Revenue by Day of Week ───")
     
     day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    daily = df.groupby('DayOfWeek')['Revenue'].sum().reindex(day_order).reset_index()
+    daily = df.groupby('DayOfWeek')['Revenue'].sum().reindex(day_order).fillna(0).reset_index()
     
     fig, ax = plt.subplots(figsize=(10, 6))
     colors = [PALETTE[3] if v == daily['Revenue'].max() else PALETTE[0] for v in daily['Revenue']]
